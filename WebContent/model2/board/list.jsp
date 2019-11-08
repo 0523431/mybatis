@@ -89,8 +89,8 @@
 				<td>
 					<co:set var="today" value="<%= new java.util.Date() %>" />
 					<fmt:formatDate value="${today}" var="today1" pattern="yyyy-MM-dd" />
-					<fmt:parseDate value="${b.regdate}" var="today2" pattern="yyyy-MM-dd HH:mm:ss" />
-					<fmt:formatDate value="${today2}" var="today3" pattern="yyyy-MM-dd" />
+				<%--<fmt:parseDate value="${b.regdate}" var="today2" pattern="yyyy-MM-dd HH:mm:ss" />  --%>
+					<fmt:formatDate value="${b.regdate}" var="today3" pattern="yyyy-MM-dd" />
 
 					<co:if test="${today1 == today3}">
 						<fmt:formatDate value="${b.regdate}" pattern="HH:mm:ss" />						

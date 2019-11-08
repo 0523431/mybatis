@@ -15,12 +15,12 @@
 
 <script type="text/javascript">
 	function win_findid() {
-		var op = "width=500, height=250, munubar=no, top=300, left=400";
+		var op = "width=650, height=300, munubar=no, top=300, left=400";
 		open("idForm.me","",op);
 	}
 	
 	function win_findpass() {
-		var op = "width=500, height=250, munubar=no, top=300, left=400";
+		var op = "width=650, height=350, munubar=no, top=300, left=400";
 		open("pwForm.me","",op);
 	}
 	

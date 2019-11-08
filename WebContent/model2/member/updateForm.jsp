@@ -11,7 +11,7 @@
 
 <script type="text/javascript">
 	function win_upload() {
-		var op = "width=600, height=200,munubar=no,top=200,left=200";
+		var op = "width=600, height=300,munubar=no,top=200,left=200";
 		open("pictureForm.me","window`s name",op);
 	}
 	
@@ -28,7 +28,7 @@
 	}
 	
 	function win_modify() {
-		var op = "width=500, height=250, munubar=no, top=300, left=400";
+		var op = "width=500, height=350, munubar=no, top=300, left=400";
 		open("passwordForm.me","",op);
 		// 강제로 submit()을 해줘야해 f.submit()?
 	}
