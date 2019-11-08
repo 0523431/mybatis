@@ -37,6 +37,7 @@ public class LoginAction implements Action {
 		if(mem !=null) { // db에 정보가 있으면(id 존재)
 			
 			if(pass.contentEquals(mem.getPass())) {
+				
 				// session.setAttribute("login", id);
 				// session은 jsp의 내장객체이지, java의 내장객체가 아니니까 
 				request.getSession().setAttribute("login", id);

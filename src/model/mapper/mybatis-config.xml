@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- xml문서는 첫번째줄에 있는 내용이 먼저 나와야 함 (주석은 두번째줄부터 가능) -->
+<!-- <이 xml은 dtd규칙에 맞춰서 루트 태그configuration을 시작으로 작성되어야해 >
+
+	 !DOCTYPE : xml문서 작성 규칙을 지정한 파일을 지정해줌
+	 => xml문서 규칙을 가지고 있는 문서 파일 : "http://mybatis.org/dtd/mybatis-3-config.dtd"
+
+	 => 이 문서는 루트 태그 configuration부터 시작할거야
+	 => PUBLIC : dtd문서가 국제적으로 인정받음
+	    SYSTEM : 개인용
+	 => "-//mybatis.or/DTD config 3.0//EN"
+	    : - 국제공인을 받지않음(기관에 대한 정보)을 나타냄
+ -->
+ 
+<!DOCTYPE configuration
+ PUBLIC "-//mybatis.or/DTD config 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<properties resource="model/mapper/mybatis.properties" /> <!-- 변경이 있을 시, mybatis.properties 파일만 수정하면 됨 -->
+	<!-- 파일형태로 접근하기 때문에 model.mapper가 아니라 /로 경로 표시 -->
+	
+	<!-- Alias는 mapper.xml로 연결할 때 사용하게 됨 (인터페이스 설정시, 사용xx) -->
+	<typeAliases>
+		<typeAlias type="model.Member" alias="Member" />
+		<typeAlias type="model.Board" alias="Board" />
+	</typeAliases>
+	
+	<!-- db connection을 설정 -->
+	<environments default="development">
+		<environment id="development">
+			<!-- 트랜잭션 관리자 : db가 commit과 rollback -->
+			<transactionManager type="JDBC" />
+			<!-- pooled : db를 close없이 계속 연결해서 사용 -->
+			<dataSource type="POOLED">
+				<property name="driver" value="${jdbc.driver}"/> <!-- value="${jdbc.driver}" : org.mariadb.jdbc.Driver -->
+				<property name="url" value="${jdbc.url}"/>
+				<property name="username" value="${jdbc.username}"/>
+				<property name="password" value="${jdbc.password}"/>
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<!-- 사용할 sql구문을 저장한 blabla.xml, interface을 설정 -->
+	<mappers>
+		<package name="model.mapper" />
+		<!-- 인터페이스를 패키지로 접근하기 때문에 model.mapper
+			 package
+		-->	
+		<!--
+			- xml을 사용하면, resource를 통해서 다 연결해줘야함
+			- 인터페이스 자바 클래스를 사용하면, class를 연결해주면 되는데
+			     그마저도 한번에 연결 할 수 있는 방법이 package name을 설정해주면 됨
+		-->
+		
+	</mappers>
+
+</configuration>

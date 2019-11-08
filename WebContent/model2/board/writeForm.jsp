@@ -8,12 +8,6 @@
 <title>게시판 글쓰기</title>
 <link rel="stylesheet" href="../../css/main.css">
 
-<script type="text/javascript" src="http://cdn.ckeditor.com/4.5.7/full/ckeditor.js">
-<%--
-	version => full / smart / ...
---%>
-</script>
-
 <script type="text/javascript">
 	function inputcheck() {
 		ff = document.f;

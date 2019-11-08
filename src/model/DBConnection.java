@@ -1,45 +1,48 @@
 package model;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.IOException;
+import java.io.Reader;
+
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 /*
  * 접근제어자를 쓰지 않았다 : 같은 패키지에서만 접근이 가능한거야
  */
 
+// 같은 패키지 model패키지에서만 사용이 가능함
+// static이니까 DBConnection을 .으로 연결해오면 당연히 실행되는 거야?
 
 public class DBConnection {
-	private DBConnection() {
-		
-	} // 객체 생성을 할 수 없게 만들어줌
 	
-	// static이야..
-	static Connection getConnection() {
-		Connection conn = null;
+	// static : 전체 객체에서 한번만 쓸거야
+	// sqlMap : 컨테이너 객체
+	private static SqlSessionFactory sqlMap;
+	
+	// static초기화 블럭
+	static {
+		// 파일이기때문에 파일명으로 접근할 수 있게 model.mapper이지만 폴더로 표시
+		// mybatis-config.xml 파일의 위치
+		String resource = "model/mapper/mybatis-config.xml";
+		Reader reader = null;
 		try {
-			Class.forName("org.mariadb.jdbc.Driver");
-			conn = DriverManager.getConnection("jdbc:mariadb://localhost:3306/classdb", "scott", "1234");
-		} catch (Exception e) {
+			reader = Resources.getResourceAsReader(resource);
+		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		return conn; // MemberDao 클래스로 return
+		// build : Connection 객체 설정
+		//         SQL 구문을 저장하는 컨테이너 설정 (reader로 부터 읽어서)
+		sqlMap = new SqlSessionFactoryBuilder().build(reader);
 	}
 	
-	static void close(Connection conn, Statement stmt, ResultSet rs) {
-		try {
-			if (rs != null)
-				rs.close();
-			if (stmt != null)
-				stmt.close();
-			if (conn != null) {
-				conn.commit();
-				conn.close();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	static SqlSession getConnection() {
+		return sqlMap.openSession(); // 성공시=> DB와 연결 (sqlMap에 있는 Connection 객체를 통해)
+	}
+	
+	static void close(SqlSession session) {
+		session.commit();
+		session.close();
 	}
 }

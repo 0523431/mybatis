@@ -34,7 +34,21 @@
 		<tr><th>제목</th>
 			<td><input type="text" name="title" value="${info.title}"></td></tr>
 		<tr><th>내용</th>
-			<td><textarea rows="15" name="content">${info.content}</textarea></td></tr>
+			<td><textarea rows="15" name="content" id="content1">${info.content}</textarea></td></tr>
+			<script>
+				<%-- <id를 설정해줘야함>
+				
+					  이 기능을 쓰면 내용에 이미지를 올릴 수 있음
+					  이미지 업로드용 url : filebrowserImageUploadUrl => 업로드 탭이 만들어짐
+					  
+					 imgupload.do : 업로드를 위한 url을 지정해줌
+					 
+					 -------------------------------------
+					 업로드 탭에서 이미지 선택하고 업로드 버튼을 누르면 CKEDITOR가 imgupload.do를 실행시킴
+					 그러면 method.properties에서 imgupload 메서드로 연결 시키고
+				--%>
+				CKEDITOR.replace("content1", {filebrowserImageUploadUrl : "imgupload.do"});
+			</script>
 		<tr><td>첨부파일</td>
 			<td style="text-align : left">
 				<c:if test="${!empty info.file1}">

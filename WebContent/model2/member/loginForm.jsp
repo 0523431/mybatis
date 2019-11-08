@@ -22,8 +22,7 @@
 	function win_findpass() {
 		var op = "width=650, height=350, munubar=no, top=300, left=400";
 		open("pwForm.me","",op);
-	}
-	
+	}	
 </script>
 
 </head>
