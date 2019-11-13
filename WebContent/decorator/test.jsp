@@ -24,7 +24,7 @@
   		height: inherit;
 	}
 	
-	body.bar{background-color:#E71D36; text-align:right;}
+	.bar{background-color:#E71D36; text-align:right;}
 </style>
 <body>
 
@@ -33,7 +33,7 @@
     <a class="w3-bar-item w3-button w3-right w3-hide-large w3-hover-white w3-large w3-theme-l1"
      href="javascript:void(0)" onclick="w3_open()"><i class="fa fa-bars"></i></a>
     <a href="#" class="w3-bar-item w3-button w3-theme-l1">
-    	<img src="${path}/decorator/moana.png" style="width:10%">
+    	<img src="${path}/decorator/moana.PNG" style="width:10%">
     </a>
     <c:if test="${empty sessionScope.login}">
 		<a href="${path}/model2/member/loginForm.me" style="text-decoration:none;">[·Î±×ÀÎ]</a>

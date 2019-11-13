@@ -7,12 +7,12 @@
 		<pattern>/model2/board/*</pattern>
 	</decorator> -->
 
-	<decorator name="main" page="test.jsp">
+	<decorator name="mem" page="test.jsp">
 	<!-- 같은 레이아웃을 쓰기 때문에 한번에 처리함 -->
 		<pattern>/model2/member/*</pattern>
 	</decorator>
 	
-	<decorator name="main" page="decorator3.jsp">
+	<decorator name="board" page="decorator3.jsp">
 		<pattern>/model2/board/*</pattern>
 	</decorator>
 	
