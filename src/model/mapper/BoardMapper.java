@@ -60,4 +60,12 @@ public interface BoardMapper {
 	@Delete("delete from board where num=#{num}")
 	int deleteB(Board b);
 	
+	// 맵객체를 리스트형태로 전달
+	@Select("select name , count(*) as cnt "
+			+ " from board "
+			+ " group by name "
+			+ " having cnt >1 "
+			+ " order by cnt desc ")
+	List<Map<String, Integer>> graph();
+	
 }

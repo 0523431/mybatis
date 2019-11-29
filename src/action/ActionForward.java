@@ -26,5 +26,4 @@ public class ActionForward {
 	public void setView(String view) {
 		this.view = view;
 	}
-	
 }

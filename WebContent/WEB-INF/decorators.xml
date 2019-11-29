@@ -8,7 +8,6 @@
 	</decorator> -->
 
 	<decorator name="mem" page="test.jsp">
-	<!-- 같은 레이아웃을 쓰기 때문에 한번에 처리함 -->
 		<pattern>/model2/member/*</pattern>
 	</decorator>
 	
@@ -21,5 +20,6 @@
 		<pattern>/model2/member/picture*</pattern>
 		<pattern>/model2/member/id*</pattern>
 		<pattern>/model2/member/pw*</pattern>
+		<pattern>/model2/ajax/*</pattern>
 	</excludes>
 </decorators>

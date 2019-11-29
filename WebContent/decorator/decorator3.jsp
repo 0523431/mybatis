@@ -14,10 +14,194 @@
 <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
 <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<%-- charjs를 쓰기 위해서 --%>
+<script type="text/javascript" src="http://www.chartjs.org/dist/2.9.3/Chart.min.js">
+</script>
+
+<%-- ajax을 이용해서 사용할 예정이라서 jquery를 연결 --%>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+	var randomColorFactor = function() {
+		return Math.round(Math.random() *255);
+	};
+	var randomColor = function(opacity) {
+		return "rgba("+randomColorFactor() + ","
+			+ randomColorFactor() + ","
+			+ randomColorFactor() + ","
+			+ (opacity || '.3') +")";
+	};
+	
+	// 문서로드가 완료되면, exchangeRate() 함수를 호출해
+	$(document).ready(function() {
+		exchangeRate();
+//		setInterval(exchangeRate, 1000*60) // 1분마다 새로고침
+		
+		// 그래프 로딩 함수
+		graphs();
+	})
+	
+	function exchangeRate() {
+		// $.ajax : 서버에 요청해
+		// .do ==> method.properties
+		$.ajax("${path}/model2/ajax/exchange3.do", { // exchange.do : 한개만 받을 때, exchange2.do : 긴 코드
+			<%--
+				data : exchange.jsp에서 제공하는 html페이지
+			--%>
+			success : function(data) { // callback함수
+				$("#exchange").html(data); // 정상적으로 완료되면, 아이디가 exchange인 곳에 data가 들어감
+			},
+			error : function(e) {
+				alert("서버 오류" + e.status);
+			}
+		})
+	}
+	
+	// json형태를 자바단에서 만들어줌
+	function graphs() {
+		$.ajax("${path}/model2/ajax/graph.do", {
+			success : function(data) {
+				console.log(data);
+				//pieGraphprint(data);
+				//barGraphprint(data);
+			},
+			error : function(e) {
+				alert("서버오류" + e.satus);
+			}
+		})
+	}
+	
+	// json형태를 view단에서 만들어줌
+	function graphs() {
+		$.ajax("${path}/model2/ajax/graph2.do", {
+			success : function(data) {
+				console.log(data);
+				pieGraphprint(data);
+				barGraphprint(data);
+			},
+			error : function(e) {
+				alert("서버오류" + e.satus);
+			}
+		})
+	}
+	
+	function pieGraphprint(data) {
+		// data : 서버에서 전달한 JSON형태 데이터
+		var rows = JSON.parse(data);
+		
+		// 배열 데이터로 만들어줌
+		var names = [];
+		var datas = [];
+		var colors = [];
+		
+		$.each(rows, function(index, item) {
+			names[index] = item.name; // 글쓴이
+			datas[index] = item.cnt; // 글의 개수 저장
+			colors[index] = randomColor(1);
+		})
+		
+		var config = {
+			type : "pie",
+			data : {
+				datasets :[{
+					data : datas,
+					backgroundColor : colors,
+				}],
+				labels : names
+			},
+			options : {
+				responsive : true,
+				legend : {
+					position : "top"
+				},
+				title : {
+					display : true,
+					text : "글쓴이 별 게시판 등록 건수"
+				}
+			}
+		};
+		var ctx = document.getElementById("canvas").getContext("2d");
+		new Chart(ctx, config);
+	}
+	
+	function barGraphprint(data) {
+		// data : 서버에서 전달한 JSON형태 데이터
+		var rows = JSON.parse(data);
+		
+		// 배열 데이터로 만들어줌
+		var names = [];
+		var datas = [];
+		var colors = [];
+		
+		$.each(rows, function(index, item) {
+			names[index] = item.name; // 글쓴이
+			datas[index] = item.cnt; // 글의 개수 저장
+			colors[index] = randomColor(1);
+		})
+		
+		var config = {
+			type : "bar",
+			data : {
+				datasets :[
+				{
+					type:"bar",
+					label:"건수",
+					data : datas,
+					backgroundColor : colors
+				},
+				{
+					type:"list",
+					label:"건수",
+					data : datas,
+					backgroundColor : colors
+				}],
+				labels : names
+			},
+			options : {
+				responsive : true,
+				legend : {
+					position : "top"
+				},
+				title : {
+					display : true,
+					text : "글쓴이 별 게시판 등록 건수"
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: '게시물 작성자'
+						},
+						stacked : true // 0부터 시작하게 해줌
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: '게시물 작성 건수'
+						},
+						stacked : true
+					}]
+				}
+			}
+		};
+		var ctx = document.getElementById("canvas_bar").getContext("2d");
+		new Chart(ctx, config);
+	}
+	
+</script>
 <style>
 html, body, h1, h2, h3, h4, h5 {font-family: "Open Sans", sans-serif}
 </style>
 <decorator:head />
+<link rel="stylesheet" href="${path}/css/main.css">
+<script type="text/javascript" src="http://cdn.ckeditor.com/4.5.7/full/ckeditor.js">
+<%--
+	모든 게시판에 스마트 에디터를 쓰겠다 !
+	version => full / smart / ...
+--%>
+</script>
 
 <body class="w3-theme-l5">
 <!-- Navbar 상단바 부분-->
@@ -35,7 +219,7 @@ html, body, h1, h2, h3, h4, h5 {font-family: "Open Sans", sans-serif}
 </div>
 
 <!-- Page Container -->
-<div class="w3-container w3-content" style="max-width:1400px;margin-top:80px">    
+<div class="w3-container w3-content" style="max-width:1600px;margin-top:80px">    
   <!-- The Grid -->
   <div class="w3-row">
     <!-- Left Column -->
@@ -69,49 +253,21 @@ html, body, h1, h2, h3, h4, h5 {font-family: "Open Sans", sans-serif}
           <div id="Demo3" class="w3-hide w3-container">
          <div class="w3-row-padding">
          <br>
-           <div class="w3-half">
-             <img src="/w3images/lights.jpg" style="width:100%" class="w3-margin-bottom">
-           </div>
-           <div class="w3-half">
-             <img src="/w3images/nature.jpg" style="width:100%" class="w3-margin-bottom">
-           </div>
-           <div class="w3-half">
-             <img src="/w3images/mountains.jpg" style="width:100%" class="w3-margin-bottom">
-           </div>
-           <div class="w3-half">
-             <img src="/w3images/forest.jpg" style="width:100%" class="w3-margin-bottom">
-           </div>
-           <div class="w3-half">
-             <img src="/w3images/nature.jpg" style="width:100%" class="w3-margin-bottom">
-           </div>
-           <div class="w3-half">
-             <img src="/w3images/snow.jpg" style="width:100%" class="w3-margin-bottom">
-           </div>
+           
          </div>
           </div>
         </div>      
       </div>
       <br>
       
-      <!-- Interests --> 
-      <div class="w3-card w3-round w3-white w3-hide-small">
+      <!-- Interests => 환율정보 위치 --> 
+      
         <div class="w3-container">
-          <p>Interests</p>
-          <p>
-            <span class="w3-tag w3-small w3-theme-d5">News</span>
-            <span class="w3-tag w3-small w3-theme-d4">W3Schools</span>
-            <span class="w3-tag w3-small w3-theme-d3">Labels</span>
-            <span class="w3-tag w3-small w3-theme-d2">Games</span>
-            <span class="w3-tag w3-small w3-theme-d1">Friends</span>
-            <span class="w3-tag w3-small w3-theme">Games</span>
-            <span class="w3-tag w3-small w3-theme-l1">Friends</span>
-            <span class="w3-tag w3-small w3-theme-l2">Food</span>
-            <span class="w3-tag w3-small w3-theme-l3">Design</span>
-            <span class="w3-tag w3-small w3-theme-l4">Art</span>
-            <span class="w3-tag w3-small w3-theme-l5">Photos</span>
-          </p>
+          <div id="exchange">
+          	<!-- 여기에 환율정보가 올 위치 -->
+          </div>
         </div>
-      </div>
+      
       <br>
       
       <!-- Alert Box -->
@@ -134,11 +290,19 @@ html, body, h1, h2, h3, h4, h5 {font-family: "Open Sans", sans-serif}
           <img src="file/${file1}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:60px">
         </c:if>
         <span class="w3-right w3-opacity">${today}</span>
+        <div id="container" style="width: 80%;" class="w3-row-padding">
+        	<!-- 차트 위치 -->
+        	<canvas id="canvas">
+			</canvas>
+			<br><br>
+			<canvas id="canvas_bar">
+			</canvas>
+        </div>
+        
         <hr class="w3-clear">
         <div class="w3-row-padding" style="margin:0 -16px">
         	<decorator:body />
             <div class="w3-half">
-              <img src="/w3images/lights.jpg" style="width:100%" alt="Northern Lights" class="w3-margin-bottom">
             </div>           
         </div>
         <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom"><i class="fa fa-thumbs-up"></i> 좋아요</button>
@@ -150,7 +314,6 @@ html, body, h1, h2, h3, h4, h5 {font-family: "Open Sans", sans-serif}
       <div class="w3-card w3-round w3-white w3-center">
         <div class="w3-container">
           <p>Friend Request</p>
-          <img src="/w3images/avatar6.png" alt="Avatar" style="width:50%"><br>
           <span>Jane Doe</span>
           <div class="w3-row w3-opacity">
             <div class="w3-half">

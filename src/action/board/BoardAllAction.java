@@ -2,11 +2,24 @@ package action.board;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import com.oreilly.servlet.MultipartRequest;
 
@@ -350,4 +363,183 @@ public class BoardAllAction {
 		return new ActionForward(false, "ckeditor.jsp");
 	}
 	
+	// /model2/ajax/exchange.do=exchange
+	public ActionForward exchange(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		// 크롤링할 url주소
+		String url = "https://www.koreaexim.go.kr/site/program/financial/exchange?menuid=001001004002001";
+		String line = "";
+		Document doc = null;
+		
+		List<String> list = new ArrayList<String>();
+		List<String> list2 = new ArrayList<String>();
+		try {
+			doc = Jsoup.connect(url).get();
+			Elements e1 = doc.select(".tc"); // 처음부터 클래스 속성 tc를 찾아 파싱 tc : 국가코드, 환율값 태그
+			Elements e2 = doc.select(".tl2.bdl"); // 국가이름 태그
+			
+			// list객체 Elements
+			for(int i=0; i<e1.size(); i++) {
+				if(e1.get(i).html().equals("USD")) { // 국가 코드가 USD니?
+					list.add(e1.get(i).html()); // list에 USD 정보 저장
+					for(int j=1; j<=6; j++) { // 0-6 ==> 7개의 정보 중 1-6개의 정보를 list에 저장
+						list.add(e1.get(i+j).html());
+					}
+					break;
+				}
+			}
+			for(int i=0; i<e1.size(); i++) {
+				if(e1.get(i).html().equals("EUR")) { // 국가 코드가 USD니?
+					list.add(e1.get(i).html()); // list에 USD 정보 저장
+					for(int j=1; j<=6; j++) { // 0-6 ==> 7개의 정보 중 1-6개의 정보를 list에 저장
+						list.add(e1.get(i+j).html());
+					}
+					break;
+				}
+			}
+			for(Element ele : e2) { // 국가이름 태그 중 미국을 찾아
+				if(ele.html().contains("미국")) {
+					list2.add(ele.html());
+				}
+			}
+			for(Element ele : e2) {
+				if(ele.html().contains("유로")) {
+					list2.add(ele.html());
+				}
+			}
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		// view에 전달하기 위한 과정
+		request.setAttribute("list", list);
+		request.setAttribute("list2", list2);
+		request.setAttribute("today", new Date()); // 시점을 알기위해
+		return new ActionForward(); // ActionForward객체로 전달 || 빈칸이면 (false, exchange.jsp)가 뷰단이 되는거야
+	}
+	// /model2/ajax/exchange2.do=exchange2
+	public ActionForward exchange2(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		// 크롤링할 url주소
+		String url = "https://www.koreaexim.go.kr/site/program/financial/exchange?menuid=001001004002001";
+		String line = "";
+		Document doc = null;
+		
+		// key : 국가이름 , value : 환율코드, 환율값
+		Map<String, List<String>> map = new HashMap<>();
+		try {
+			doc = Jsoup.connect(url).get();
+			Elements e1 = doc.select(".tc");
+			Elements e2 = doc.select(".tl2.bdl");
+			for(Element ele : e2) {
+				List<String> list = new ArrayList<>();
+				if(ele.html().contains("미국")) {
+					list.clear();
+					for(int i=0; i<e1.size(); i++) {
+						if(e1.get(i).html().startsWith("USD")) {
+							list.add(e1.get(i).html());
+							for(int j=1; j<=6; j++) {
+								list.add(e1.get(i+j).html());
+							}
+						}
+					}
+					map.put(ele.html(), list);
+				}
+				if(ele.html().contains("유로")) {
+					list.clear();
+					for(int i=0; i<e1.size(); i++) {
+						if(e1.get(i).html().startsWith("EUR")) {
+							list.add(e1.get(i).html());
+							for(int j=1; j<=6; j++) {
+								list.add(e1.get(i+j).html());
+							}
+						}
+					}
+					map.put(ele.html(), list);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		request.setAttribute("map", map);
+		request.setAttribute("today", new Date());
+		return new ActionForward(); // ActionForward객체로 전달 || 빈칸이면 (false, exchange2.jsp)가 뷰단이 되는거야
+	}
+	
+	public ActionForward exchange3(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		// 크롤링할 url주소
+		String url = "https://www.koreaexim.go.kr/site/program/financial/exchange?menuid=001001004002001";
+		String line = "";
+		Document doc = null;
+		// key : 국가이름 / value : 환율코드, 환율값
+		Map<String, List<String>> map = new TreeMap<>();
+		// HashMap : 순서를 정할 수 없어
+		// new TreeMap<>(Comparator.reverseOrder()) : 역순으로 정렬
+		List<String> names = Arrays.asList("미국", "유로", "홍콩", "영국"); // names[0]:미국
+		List<String> codes = Arrays.asList("USD", "EUR", "HKD", "GBP");
+		try {
+			doc = Jsoup.connect(url).get();
+			Elements e1 = doc.select(".tc");
+			Elements e2 = doc.select(".tl2.bdl");
+			for(Element ele : e2) { // 국가코드를 가지고 있는 객체
+				for(int n=0; n<names.size(); n++) {
+					if(ele.html().contains(names.get(n))) { // names.get(0):미국
+						List<String> list = new ArrayList<>();
+						for(int i=0; i<e1.size(); i++) { // 통화코드에 해당하는 내용을 가지고 있는 객체
+							if(e1.get(i).html().startsWith(codes.get(n))) { // e1.get(i)가 codes.get(n):USD가 될 때 까지 반복
+								list.add(e1.get(i).html()); // 처음에 들어가게되는 list값은 USD가 될거야 / i값은 USD코드값의 index
+								for(int j=1; j<=6; j++) {
+									list.add(e1.get(i+j).html()); // USD의 다음값부터 저장할거야 (통화코드 +6 : USD와 관련된 정보들이니까)
+								}
+							}
+						}
+						// ele.html() : 국가이름
+						// list : 국가의 통화코드와 환율값(총 7개의 정보를 가지고있음)
+						map.put(ele.html(), list);
+					}
+				}
+			}
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		request.setAttribute("map", map);
+		request.setAttribute("today", new Date());
+		return new ActionForward(); // ActionForward객체로 전달 || 빈칸이면 (false, exchange3.jsp)가 뷰단이 되는거야
+	}
+	
+	public ActionForward graph(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		
+		List<Map<String,Integer>> list = dao.boardgraph();
+		// json형태로 만들어주는 과정
+		// [{"name":"홍길동","cnt":3},
+		StringBuilder json = new StringBuilder("[");
+		int i = 0;
+		System.out.println(list.size());
+		for(Map<String,Integer> m : list) {
+			// Map.Entry객체는 키와 밸류 즉, 컬럼과 그 값 즉, 이름=홍길동/cnt=3
+			for(Map.Entry<String, Integer> me : m.entrySet()) {
+				if(me.getKey().equals("name")) {
+					json.append("{\"name\":\""+me.getValue()+"\",");
+				}
+				if(me.getKey().equals("cnt")) {
+					json.append("\"cnt\":"+me.getValue()+"}");
+				}
+			}
+			i++;
+			if(i < list.size()) { // 개수보다 작을 때, 연결해주기위해 쉼표를 붙여줘
+				json.append(",");
+			}
+		}
+		json.append("]"); // json형태의 데이터 완성 !
+		
+		request.setAttribute("json", json.toString().trim());
+		return new ActionForward();
+	}
+	
+	public ActionForward graph2(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+		List<Map<String,Integer>> list = dao.boardgraph();
+		
+		request.setAttribute("list", list);
+		return new ActionForward();
+	}
+
 }
