@@ -537,6 +537,7 @@ public class BoardAllAction {
 	public ActionForward graph2(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		List<Map<String,Integer>> list = dao.boardgraph();
+		System.out.println("graph2 list : "+list);
 		
 		request.setAttribute("list", list);
 		return new ActionForward();

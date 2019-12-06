@@ -86,17 +86,18 @@
 	}
 	
 	function pieGraphprint(data) {
-		// data : 서버에서 전달한 JSON형태 데이터
+		// data : 서버에서 전달한 JSON형태의 데이터
 		var rows = JSON.parse(data);
 		
 		// 배열 데이터로 만들어줌
-		var names = [];
-		var datas = [];
-		var colors = [];
+		var names = []; // 라벨 데이터
+		var datas = []; // 건수 데이터
+		var colors = []; // 색상
 		
+		// json파일을 분석하여 필요한 데이터로 저장해주는 과정
 		$.each(rows, function(index, item) {
-			names[index] = item.name; // 글쓴이
-			datas[index] = item.cnt; // 글의 개수 저장
+			names[index] = item.name; // 글쓴이 | name : boardAllAction에서 정한 변수명
+			datas[index] = item.cnt; // 글의 개수 저장 | cnt : boardAllAction에서 정한 변수명
 			colors[index] = randomColor(1);
 		})
 		
@@ -125,7 +126,7 @@
 	}
 	
 	function barGraphprint(data) {
-		// data : 서버에서 전달한 JSON형태 데이터
+		// data : 서버에서 전달한 JSON형태의 데이터
 		var rows = JSON.parse(data);
 		
 		// 배열 데이터로 만들어줌
@@ -139,56 +140,60 @@
 			colors[index] = randomColor(1);
 		})
 		
-		var config = {
-			type : "bar",
-			data : {
-				datasets :[
+		var chartData = {
+			labels: names,
+			datasets: [
 				{
 					type:"bar",
 					label:"건수",
-					data : datas,
-					backgroundColor : colors
+					data: datas,
+					backgroundColor: colors
 				},
 				{
-					type:"list",
+					type:"line",
 					label:"건수",
-					data : datas,
-					backgroundColor : colors
-				}],
-				labels : names
-			},
-			options : {
-				responsive : true,
-				legend : {
-					position : "top"
-				},
-				title : {
-					display : true,
-					text : "글쓴이 별 게시판 등록 건수"
-				},
-				scales: {
-					xAxes: [{
-						display: true,
-						scaleLabel: {
-							display: true,
-							labelString: '게시물 작성자'
-						},
-						stacked : true // 0부터 시작하게 해줌
-					}],
-					yAxes: [{
-						display: true,
-						scaleLabel: {
-							display: true,
-							labelString: '게시물 작성 건수'
-						},
-						stacked : true
-					}]
+					data: datas,
+					backgroundColor: colors,
+					borderWidth: 2,
+					fill: false
 				}
-			}
+			]
 		};
 		var ctx = document.getElementById("canvas_bar").getContext("2d");
-		new Chart(ctx, config);
-	}
+		new Chart(ctx, {
+				type: "bar",
+				data: chartData,
+				options: {
+					responsive: true,
+					legend: {
+						display: false,
+						position : "top"
+					},
+					title : {
+						display : true,
+						text : "글쓴이 별 게시판 등록 건수"
+					},
+					scales: {
+						xAxes: [{
+							display: true,
+							scaleLabel: {
+								display: true,
+								labelString: '게시물 작성자'
+							},
+							stacked : true // 0부터 시작하게 해줌
+						}],
+						yAxes: [{
+							display: true,
+							scaleLabel: {
+								display: true,
+								labelString: '게시물 작성 건수'
+							},
+							stacked : true
+						}]
+					}
+				}
+		});
+	};
 	
 </script>
 <style>
@@ -281,15 +286,9 @@ html, body, h1, h2, h3, h4, h5 {font-family: "Open Sans", sans-serif}
     
     <!-- End Left Column -->
     </div>
-    
-    <!-- Middle Column -->
-    <div class="w3-col m7">
-      
+        <!-- Middle Column -->
+    <div class="w3-col m7">      
       <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
-        <c:if test="${!empty b.getFile1()}">
-          <img src="file/${file1}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:60px">
-        </c:if>
-        <span class="w3-right w3-opacity">${today}</span>
         <div id="container" style="width: 80%;" class="w3-row-padding">
         	<!-- 차트 위치 -->
         	<canvas id="canvas">
@@ -298,7 +297,16 @@ html, body, h1, h2, h3, h4, h5 {font-family: "Open Sans", sans-serif}
 			<canvas id="canvas_bar">
 			</canvas>
         </div>
-        
+
+        <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom"><i class="fa fa-thumbs-up"></i> 좋아요</button>
+      </div>     
+    <!-- End Middle Column -->
+    </div>
+    
+    <!-- Middle Column -->
+    <div class="w3-col m7">
+      
+      <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
         <hr class="w3-clear">
         <div class="w3-row-padding" style="margin:0 -16px">
         	<decorator:body />
